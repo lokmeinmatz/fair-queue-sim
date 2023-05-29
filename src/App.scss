@@ -1,0 +1,43 @@
+.sim-input > form {
+  fieldset {
+    width: 200px;
+  }
+
+  display: flex;
+  max-width: 600px;
+  flex-direction: column;
+
+}
+
+
+.sim-state {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  grid-template-areas: 
+    "basic strategy"
+    "parsed strategy"
+  ;
+
+  tr {
+    transition: background-color 0.2s linear;
+    border-bottom: 1px solid gray;
+  }
+
+  #basic-state {
+    grid-area: basic;
+
+    border: 1px solid gray;
+
+    tbody tr:nth-child(2n) {
+      background-color: unset;
+    }
+  }
+
+  #parsed {
+    grid-area: parsed;
+    tr.current {
+      border: 2px solid greenyellow;
+    }
+  }
+
+}
