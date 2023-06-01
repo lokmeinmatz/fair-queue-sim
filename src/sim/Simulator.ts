@@ -10,6 +10,7 @@ export interface SimState {
     // strategy: IStrategy
     numFlows: number
     finished: boolean
+    strategyInfos: Record<string, any>
 }
 
 const MICRO_FAC = 1_000_000
@@ -37,12 +38,17 @@ export class Simulator implements SimState {
             inputQueue: structuredClone(this.inputQueue),
             queued: structuredClone(this.queued),
             sent: structuredClone(this.sent),
-            finished: this.finished
+            finished: this.finished,
+            strategyInfos: this.strategyInfos
         }
     }
 
     get finished(): boolean {
         return !this.inputQueue.length && !this.queued.size
+    }
+
+    get strategyInfos() {
+        return this.strategy.getStrategyDisplayData()
     }
 
     step() {

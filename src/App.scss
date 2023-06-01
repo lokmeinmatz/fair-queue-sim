@@ -81,7 +81,15 @@ body, #root {
     justify-self: start;
     border: 1px solid gray;
     display: grid;
-    grid-template-columns: auto min-content;
+    grid-template-columns: auto min-content auto;
+    gap: 1em;
+
+    .strategy-infos {
+      margin-right: 1em;
+      p {
+        margin: 0.2em 0;
+      }
+    }
 
     table {
       width: unset;
@@ -107,6 +115,19 @@ body, #root {
 
   #latencies {
     grid-area: latencies;
+    max-width: 300px;
+    table {
+      border-left: 1px solid gray;
+    }
+
+    td:nth-child(1) {
+      width: min-content;
+      word-wrap: initial;
+    }
+
+    td:nth-child(2), td:nth-child(3) {
+      text-align: right;
+    }
   }
 
   #latency-graph {

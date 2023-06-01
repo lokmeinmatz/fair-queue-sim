@@ -36,7 +36,7 @@ export function parseInput(inp: string): ParsedData {
     res.numberOfFlows = parseInt(lines[0])
 
     for(let i = 1; i < lines.length; i++) {
-        const match = /^(\d+)\s(\d+)\s(\d+)$/.exec(lines[i])?.slice(1)
+        const match = /^(\d+)\s(\d+(?:\.\d)?)\s(\d+)$/.exec(lines[i])?.slice(1)
         if (match?.length !== 3) throw new Error(`Failed to parse line ${i}: "${lines[i]}"`)
         let [fi, si, ti] = match.map(s => parseInt(s))
         if (fi < 0 || fi >= res.numberOfFlows) throw new Error(`Line ${i}: Found flow identifier ${fi} >= number of flows ${res.numberOfFlows}`)

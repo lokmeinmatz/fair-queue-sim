@@ -68,7 +68,10 @@ const LatencyGraph: Component<{ packets: Packet[], numFlows: number}> = (props) 
                 //type: 'linear',
                 position: 'bottom',
                 beginAtZero: true,
-                stacked: true
+                stacked: true,
+                ticks: {
+                    autoSkip: true
+                }
             },
             y: {
                 type: 'linear',
@@ -78,7 +81,7 @@ const LatencyGraph: Component<{ packets: Packet[], numFlows: number}> = (props) 
         }
     }
 
-
+    const [bucketSize, setBucketSize] = createSignal(1)
 
     const data = createMemo<ChartData>(() => {
         let maxLatency = 0
@@ -95,9 +98,11 @@ const LatencyGraph: Component<{ packets: Packet[], numFlows: number}> = (props) 
         const bucketSize = Math.ceil(maxLatency / 100)
         const numBuckets = Math.ceil(maxLatency / bucketSize)
 
+        setBucketSize(bucketSize)
+
         const ds = {
-            labels: new Array(numBuckets).fill(0, 0, numBuckets).map((_, i) => bucketSize === 1 ? i : `${i*bucketSize}-${(i+1)*bucketSize-1}`),
-            //labels: new Array(numBuckets).fill(0, 0, numBuckets).map((_, i) => i),
+            //labels: new Array(numBuckets).fill(0, 0, numBuckets).map((_, i) => bucketSize === 1 ? i : `${i*bucketSize}-${(i+1)*bucketSize-1}`),
+            labels: new Array(numBuckets).fill(0, 0, numBuckets).map((_, i) => i * bucketSize),
             datasets: flowPackets.map((pkgs, flowId) => {
                 const latencies = pkgs.map(p => getLatency(p) as number)
 
@@ -116,7 +121,12 @@ const LatencyGraph: Component<{ packets: Packet[], numFlows: number}> = (props) 
     }, }) 
 
     
-    return <Bar data={data()} options={chartOptions}></Bar>
+    return <>
+        <p>latency bucket size: {bucketSize()}</p>
+        <div>
+            <Bar data={data()} options={chartOptions}></Bar>
+        </div>
+    </>
 }
 
 const SimulatorComponent: Component<{ parsed: ParsedData, strategy: StrategyName }> = (props) => {
@@ -168,6 +178,8 @@ const SimulatorComponent: Component<{ parsed: ParsedData, strategy: StrategyName
         setPlayCancel(undefined)
     }
 
+    const [showQueues, setShowQueues] = createSignal(true)
+
 
     return <div class="sim-state">
         <div id="basic-state">
@@ -197,13 +209,20 @@ const SimulatorComponent: Component<{ parsed: ParsedData, strategy: StrategyName
                     onClick={() => playCancel() ? stopPlay() : startPlay()}
                 >{playCancel() ? 'Stop' : 'Play'}</button>
             </fieldset>
+            <div class="strategy-infos">
+                <p>Strategy infos</p>
+                <For each={Object.entries(simState().strategyInfos)}>{([key, val]) => <p>{key}: {val?.toString()}</p>}</For>
+            </div>
         </div>
         <div id="queue-state">
-            <PacketList title="inputs" packets={simState().inputQueue}></PacketList>
-            <Arrow />
-            <PacketList title="queued" packets={[...simState().queued.values()]}></PacketList>
-            <Arrow />
-            <PacketList title="sent" packets={simState().sent} showLatencies></PacketList>
+            <button style={{"align-self": 'start'}} onclick={() => setShowQueues(!showQueues())}>{showQueues() ? 'hide queues' : 'show queues'}</button>
+            <Show when={showQueues()}>
+                <PacketList title="inputs" packets={simState().inputQueue}></PacketList>
+                <Arrow />
+                <PacketList title="queued" packets={[...simState().queued.values()]}></PacketList>
+                <Arrow />
+                <PacketList title="sent" packets={simState().sent} showLatencies></PacketList>
+            </Show>
         </div>
         <div id="throughputs">
             <h3>Throughputs</h3>
