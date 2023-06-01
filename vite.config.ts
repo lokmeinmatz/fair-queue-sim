@@ -6,7 +6,9 @@ export default defineConfig({
   server: {
     port: 3000,
   },
+  base: '/fair-queue-sim/',
   build: {
+    outDir: 'docs',
     target: 'esnext',
   },
 });
