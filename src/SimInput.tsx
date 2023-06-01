@@ -1,5 +1,5 @@
 import { Component, For, Match, Switch, createSignal } from "solid-js";
-import { IStrategy } from "./sim/strategies/IStrategy";
+import { STRATEGIES, StrategyName } from "./sim/strategies";
 
 const EXAMPLE_TEXT = `
 # numberOfFlows
@@ -7,23 +7,20 @@ const EXAMPLE_TEXT = `
 # f1 s1 t1
 1 2 3
 0 4 5
+1 3 2
 `
 
-const STRATEGIES: { name: string, strategy: new () => IStrategy }[] = [
-    {
-        name: 'GPS',
-        strategy: null as unknown as any
-    }
-]
 
-const SimInput: Component<{ onNewInput: (inpt: string) => any, open: boolean }> = (props) => {
+const SimInput: Component<{ onNewInput: (inpt: string, strategy: StrategyName) => any, open: boolean }> = (props) => {
 
     const [inputMode, setInputMode] = createSignal('text');
+    const [textInput, setTextInput] = createSignal(EXAMPLE_TEXT)
 
     const fieldSetChanged = (evt: Event) => setInputMode((evt.target as HTMLInputElement).value)
     const onSubmit = async (e: SubmitEvent) => {
         e.preventDefault()
         const formData = new FormData(e.target as HTMLFormElement);
+        console.log(formData)
         let textInput = formData.get('text-input') as string | undefined;
         const fileInput = formData.get('file-input') as File | undefined;
 
@@ -32,8 +29,7 @@ const SimInput: Component<{ onNewInput: (inpt: string) => any, open: boolean }> 
         }
         if (!textInput) return alert('No text input found');
 
-        
-        props.onNewInput(textInput)
+        props.onNewInput(textInput, formData.get('strategy') as StrategyName)
     }
 
     return <details open={props.open}>
@@ -53,12 +49,12 @@ const SimInput: Component<{ onNewInput: (inpt: string) => any, open: boolean }> 
                     </div>
                 </fieldset>
                 <label for="strategy">Strategy</label>
-                <select>
-                    <For each={STRATEGIES}>{s => <option>{s.name}</option>}</For>
+                <select name="strategy" id="strategy">
+                    <For each={STRATEGIES}>{s => <option value={s.strategyName}>{s.strategyName}</option>}</For>
                 </select>
                 <Switch>
                     <Match when={inputMode() === 'text'}>
-                        <textarea name="text-input" rows="10" cols="50">{EXAMPLE_TEXT}</textarea>
+                        <textarea name="text-input" rows="10" cols="50" onChange={e => setTextInput((e.target as HTMLTextAreaElement).value)}>{textInput()}</textarea>
                     </Match>
                     <Match when={inputMode() === 'file'}>
                         <input name="file-input" type="file"></input>
