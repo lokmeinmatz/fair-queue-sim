@@ -3,7 +3,7 @@ import { Packet, ParsedData, getLatency } from "./sim/parser";
 import { Simulator } from "./sim/Simulator";
 import { VirtualContainer, VirtualItemProps } from "@minht11/solid-virtual-container"
 import { IStrategy, StrategyName, createStrategy } from "./sim/strategies";
-import { Chart, Title, Legend, Colors, ChartOptions, ChartDataset, ChartData, Tooltip } from 'chart.js'
+import { Chart, Title, Legend, Colors, ChartOptions, ChartData, Tooltip, LinearScale } from 'chart.js'
 import { Bar } from 'solid-chartjs'
 
 const Arrow = () => {
@@ -56,7 +56,7 @@ const PacketList: Component<{ title: string, packets: Packet[], id?: string, sho
 const LatencyGraph: Component<{ packets: Packet[], numFlows: number}> = (props) => {
 
     onMount(() => {
-        Chart.register(Title, Legend, Colors, Tooltip)
+        Chart.register(Title, Legend, Colors, Tooltip, LinearScale)
     })
 
     const chartOptions: ChartOptions = {
